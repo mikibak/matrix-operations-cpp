@@ -8,14 +8,21 @@ int main()
 {
     std::cout << "Hello World!\n";
     //auto* matrix = new Matrix(MY_SIZE, MY_SIZE);
-    Matrix* matrix_ptr = new Matrix(10, 10);
-    Matrix matrix = *matrix_ptr;
-    matrix.Print();
+    //Matrix* matrix_ptr = new Matrix(10, 10);
+    //Matrix matrix = *matrix_ptr;
+    //matrix.Print();
     //188968
     //Matrix* band_matrix = new BandMatrix(10, 10, 5 + 9, -1, -1);
     Matrix* band_matrix = new BandMatrix(10, 10, 1, 2, 3);
     Matrix* band_matrix2 = new BandMatrix(10, 10, 1, 2, 3);
-    band_matrix->Print();
-    *band_matrix = *band_matrix + *band_matrix2;
-    band_matrix->Print();
+    Matrix matrix = *band_matrix;
+    Matrix matrix2 = *band_matrix2;
+    matrix.Print();
+    matrix += matrix2;
+    matrix.Print();
+
+    Matrix m1 = Matrix(10, 10);
+    Matrix m2 = Matrix(11, 11);
+    m1 += m2;
+    m1.Print();
 }

@@ -35,9 +35,27 @@ Matrix operator+(Matrix lhs, const Matrix& rhs) // otherwise, both parameters ma
 }
 
 Matrix& Matrix::operator+=(const Matrix& rhs){
+    try {
+        if(rhs.SIZE_X != this->SIZE_X && rhs.SIZE_Y != this->SIZE_Y) {
+            throw std::runtime_error(std::string("Failed to add operands: incorrect width and height"));
+        }
+
+        if(rhs.SIZE_X != this->SIZE_X) {
+            throw std::runtime_error(std::string("Failed to add operands: incorrect width, correct height"));
+        }
+
+        if(rhs.SIZE_Y != this->SIZE_Y) {
+            throw std::runtime_error(std::string("Failed to add operands: correct width, incorrect height"));
+        }
+    } catch(std::runtime_error err) {
+        std::cerr << err.what() << std::endl;
+        std::cerr << "Operands of size [" << this->SIZE_X << ", " << this->SIZE_Y << "] and " << rhs.SIZE_X << ", " << rhs.SIZE_Y << std::endl;
+        return *this;
+    }
+
     for(int y = 0; y < SIZE_Y; y++) {
         for(int x = 0; x < SIZE_X; x++) {
-            this->columns[y][x] = rhs.columns[y][x];
+            this->columns[y][x] += rhs.columns[y][x];
         }
     }
     return *this;
