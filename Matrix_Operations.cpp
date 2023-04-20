@@ -22,7 +22,8 @@ int main()
     matrix.Print();
 
     Matrix m1 = Matrix(10, 10);
-    Matrix m2 = Matrix(11, 11);
+    Matrix m2 = Matrix(10, 11);
+    m2.Print();
     m1 += m2;
     m1.Print();
 }

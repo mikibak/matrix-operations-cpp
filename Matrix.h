@@ -20,6 +20,8 @@ public:
     Matrix& operator+=(const Matrix& rhs);
 
     ~Matrix();
+
+    void CheckIfSizeEqual(const Matrix &other);
 };
 
 
