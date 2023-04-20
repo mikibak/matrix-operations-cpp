@@ -6,5 +6,4 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(.)
 
 add_executable(matrix_operations_cpp
-        Matrix.cpp
-        Matrix_Operations.cpp)
+        Matrix_Operations.cpp Matrix.cpp Matrix.h BandMatrix.cpp BandMatrix.h)
