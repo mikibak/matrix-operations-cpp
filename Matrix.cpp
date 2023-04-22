@@ -60,6 +60,27 @@ Matrix::~Matrix() {
     delete columns;
 }
 
+int Matrix::GetElement(int x, int y) {
+    try {
+        this->CheckIfValidIndex(x, y);
+    } catch(std::runtime_error& err) {
+        std::cerr << err.what() << std::endl;
+        std::cerr << "Get element error with operands of size [" << this->SIZE_X << ", " << this->SIZE_Y << "] and indices [" << x << ", " << y << "]"<< std::endl;
+        return 0;
+    }
+    return this->columns[y][x];
+}
+
+void Matrix::SetElement(int x, int y, int value) {
+    try {
+        this->CheckIfValidIndex(x, y);
+    } catch(std::runtime_error& err) {
+        std::cerr << err.what() << std::endl;
+        std::cerr << "Set element error with operands of size [" << this->SIZE_X << ", " << this->SIZE_Y << "] and indices [" << x << ", " << y << "]"<< std::endl;
+    }
+    this->columns[y][x] = value;
+}
+
 void Matrix::CheckIfSizeEqual(const Matrix &other) {
     if(other.SIZE_X != this->SIZE_X && other.SIZE_Y != this->SIZE_Y) {
         throw std::runtime_error(std::string("Wrong operands: incorrect width and height"));
@@ -71,5 +92,23 @@ void Matrix::CheckIfSizeEqual(const Matrix &other) {
 
     if(other.SIZE_Y != this->SIZE_Y) {
         throw std::runtime_error(std::string("Wrong operands: correct width, incorrect height"));
+    }
+}
+
+void Matrix::CheckIfValidIndex(int x, int y) {
+    if(x > this->SIZE_X && y > this->SIZE_Y) {
+        throw std::runtime_error(std::string("Wrong indices: too large width and height"));
+    }
+
+    if(x > this->SIZE_X) {
+        throw std::runtime_error(std::string("Wrong index: too large width, correct height"));
+    }
+
+    if(y > this->SIZE_Y) {
+        throw std::runtime_error(std::string("Wrong index: correct width, too large height"));
+    }
+
+    if(x < 0 || y < 0) {
+        throw std::runtime_error(std::string("Wrong indices: one or two indices below zero"));
     }
 }

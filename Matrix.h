@@ -11,17 +11,19 @@ protected:
     int SIZE_X;
     int SIZE_Y;
     int** columns;
+    void CheckIfSizeEqual(const Matrix &other);
+    void CheckIfValidIndex(int x, int y);
 
 
 public:
     Matrix(int size_x, int size_y);
+    int GetElement(int x, int y);
+    void SetElement(int x, int y, int value);
     void Print();
     friend Matrix operator+(Matrix lhs, const Matrix& rhs);
     Matrix& operator+=(const Matrix& rhs);
 
     ~Matrix();
-
-    void CheckIfSizeEqual(const Matrix &other);
 };
 
 
