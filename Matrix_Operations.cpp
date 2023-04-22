@@ -1,4 +1,5 @@
 #include <iostream>
+#include <math.h>
 #include "Matrix.h"
 #include "BandMatrix.h"
 
@@ -26,4 +27,19 @@ int main()
     m2.Print();
     m1 += m2;
     m1.Print();
+
+
+    //TASK A
+
+    int a1 = a1 = 5 + 9;
+    int a2 = -1;
+    int a3 = -1;
+
+    Matrix A = BandMatrix(MY_SIZE, MY_SIZE, a1, a2, a3);
+
+    Matrix b = Matrix(1, MY_SIZE);
+    for(int i = 0; i < MY_SIZE; i++) {
+        b.SetElement(0, i, sin( i * (8 + 1)));
+    }
+
 }
