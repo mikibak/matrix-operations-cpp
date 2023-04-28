@@ -18,6 +18,11 @@ Matrix::Matrix(int size_x, int size_y) {
     }
 }
 
+Matrix::Matrix() {
+    SIZE_X = 0;
+    SIZE_Y = 0;
+}
+
 void Matrix::Print() {
     for(int y = 0; y < SIZE_Y; y++) {
         for(int x = 0; x < SIZE_X; x++) {
@@ -111,4 +116,46 @@ void Matrix::CheckIfValidIndex(int x, int y) {
     if(x < 0 || y < 0) {
         throw std::runtime_error(std::string("Wrong indices: one or two indices below zero"));
     }
+}
+
+Matrix* Matrix::LowerTriangle() {
+    Matrix* triangle = new Matrix(SIZE_X, SIZE_Y);
+
+    for (int y = 0; y < SIZE_Y; y++) {
+        for (int x = 0; x < SIZE_X; x++) {
+            if(y > x) {
+                triangle->SetElement(x, y, this->columns[y][x]);
+            }
+        }
+    }
+
+    return triangle;
+}
+
+Matrix* Matrix::UpperTriangle() {
+    Matrix* triangle = new Matrix(SIZE_X, SIZE_Y);
+
+    for (int y = 0; y < SIZE_Y; y++) {
+        for (int x = 0; x < SIZE_X; x++) {
+            if(y < x) {
+                triangle->SetElement(x, y, this->columns[y][x]);
+            }
+        }
+    }
+
+    return triangle;
+}
+
+Matrix* Matrix::Diagonal() {
+    Matrix* diagonal = new Matrix(SIZE_X, SIZE_Y);
+
+    for (int y = 0; y < SIZE_Y; y++) {
+        for (int x = 0; x < SIZE_X; x++) {
+            if(y == x) {
+                diagonal->SetElement(x, y, this->columns[y][x]);
+            }
+        }
+    }
+
+    return diagonal;
 }

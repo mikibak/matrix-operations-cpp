@@ -8,6 +8,8 @@
 
 class Matrix {
 protected:
+    Matrix();
+
     int SIZE_X;
     int SIZE_Y;
     int** columns;
@@ -24,6 +26,12 @@ public:
     Matrix& operator+=(const Matrix& rhs);
 
     ~Matrix();
+
+    Matrix *LowerTriangle();
+
+    Matrix *UpperTriangle();
+
+    Matrix *Diagonal();
 };
 
 

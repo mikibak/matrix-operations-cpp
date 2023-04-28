@@ -1,9 +1,11 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "modernize-use-auto"
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include "Matrix.h"
 #include "BandMatrix.h"
 
-#define MY_SIZE 9 * 6 * 8
+#define MY_SIZE (9 * 6 * 8)
 
 int main()
 {
@@ -14,6 +16,7 @@ int main()
     //matrix.Print();
     //188968
     //Matrix* band_matrix = new BandMatrix(10, 10, 5 + 9, -1, -1);
+/*
     Matrix* band_matrix = new BandMatrix(10, 10, 1, 2, 3);
     Matrix* band_matrix2 = new BandMatrix(10, 10, 1, 2, 3);
     Matrix matrix = *band_matrix;
@@ -27,6 +30,7 @@ int main()
     m2.Print();
     m1 += m2;
     m1.Print();
+*/
 
 
     //TASK A
@@ -35,11 +39,20 @@ int main()
     int a2 = -1;
     int a3 = -1;
 
-    Matrix A = BandMatrix(MY_SIZE, MY_SIZE, a1, a2, a3);
+    Matrix* A = new BandMatrix(MY_SIZE, MY_SIZE, a1, a2, a3);
+    Matrix* b = new Matrix(1, MY_SIZE);
+    Matrix* x = new Matrix(1, MY_SIZE);
 
-    Matrix b = Matrix(1, MY_SIZE);
     for(int i = 0; i < MY_SIZE; i++) {
-        b.SetElement(0, i, sin( i * (8 + 1)));
+        int value = sin( i * (8 + 1));
+        b->SetElement(0, i, value);
     }
 
+    Matrix* L = A->LowerTriangle();
+    Matrix* U = A->UpperTriangle();
+    Matrix* D = A->Diagonal();
+
+    L->Print();
+    U->Print();
+    D->Print();
 }

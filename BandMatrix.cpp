@@ -1,7 +1,12 @@
 #include "BandMatrix.h"
 
-BandMatrix::BandMatrix(int sizeX, int sizeY, int a1, int a2, int a3) : Matrix(sizeX, sizeY) {
+BandMatrix::BandMatrix(int sizeX, int sizeY, int a1, int a2, int a3) {
+    this->SIZE_Y = sizeY;
+    this->SIZE_X = sizeX;
+
+    columns = new int* [SIZE_Y];
     for(int y = 0; y < SIZE_Y; y++) {
+        columns[y] = new int[SIZE_X];
         for(int x = 0; x < SIZE_X; x++) {
             if(x == y) {
                 //main diagonal
