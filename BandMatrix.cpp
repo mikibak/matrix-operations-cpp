@@ -1,13 +1,13 @@
 #include "BandMatrix.h"
 
 BandMatrix::BandMatrix(int sizeX, int sizeY, int a1, int a2, int a3) {
-    this->SIZE_Y = sizeY;
-    this->SIZE_X = sizeX;
+    this->ROWS = sizeY;
+    this->COLS = sizeX;
 
-    columns = new int* [SIZE_Y];
-    for(int y = 0; y < SIZE_Y; y++) {
-        columns[y] = new int[SIZE_X];
-        for(int x = 0; x < SIZE_X; x++) {
+    columns = new int* [ROWS];
+    for(int y = 0; y < ROWS; y++) {
+        columns[y] = new int[COLS];
+        for(int x = 0; x < COLS; x++) {
             if(x == y) {
                 //main diagonal
                 columns[y][x] = a1;

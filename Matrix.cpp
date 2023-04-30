@@ -4,28 +4,42 @@
 
 #include "Matrix.h"
 #include <iostream>
+#include <cmath>
 
-Matrix::Matrix(int size_x, int size_y) {
-    SIZE_X = size_x;
-    SIZE_Y = size_y;
+Matrix::Matrix(int cols, int rows) {
+    COLS = cols;
+    ROWS = rows;
 
-    columns = new int* [SIZE_Y];
-    for (int y = 0; y < SIZE_Y; y++) {
-        columns[y] = new int[SIZE_X];
-        for (int x = 0; x < SIZE_X; x++) {
-            columns[y][x] = 0;
+    columns = new int* [ROWS];
+    for (int row = 0; row < ROWS; row++) {
+        columns[row] = new int[COLS];
+        for (int col = 0; col < COLS; col++) {
+            columns[row][col] = 0;
+        }
+    }
+}
+
+Matrix::Matrix(int cols, int rows, int value) {
+    COLS = cols;
+    ROWS = rows;
+
+    columns = new int* [ROWS];
+    for (int row = 0; row < ROWS; row++) {
+        columns[row] = new int[COLS];
+        for (int col = 0; col < COLS; col++) {
+            columns[row][col] = value;
         }
     }
 }
 
 Matrix::Matrix() {
-    SIZE_X = 0;
-    SIZE_Y = 0;
+    COLS = 0;
+    ROWS = 0;
 }
 
 void Matrix::Print() {
-    for(int y = 0; y < SIZE_Y; y++) {
-        for(int x = 0; x < SIZE_X; x++) {
+    for(int y = 0; y < ROWS; y++) {
+        for(int x = 0; x < COLS; x++) {
             std::cout << columns[y][x] << "   ";
         }
         std::cout << std::endl;
@@ -35,14 +49,29 @@ void Matrix::Print() {
 
 Matrix operator+(const Matrix& lhs, const Matrix& rhs) // otherwise, both parameters may be const references
 {
-    Matrix* matrix = new Matrix(lhs.SIZE_X, lhs.SIZE_Y);
+    Matrix* matrix = new Matrix(lhs.COLS, lhs.ROWS);
 
-    matrix->SIZE_X = lhs.SIZE_X;
-    matrix->SIZE_Y = lhs.SIZE_Y;
+    matrix->COLS = lhs.COLS;
+    matrix->ROWS = lhs.ROWS;
 
-    for (int y = 0; y < matrix->SIZE_Y; y++) {
-        for (int x = 0; x < matrix->SIZE_X; x++) {
+    for (int y = 0; y < matrix->ROWS; y++) {
+        for (int x = 0; x < matrix->COLS; x++) {
             matrix->columns[y][x] = lhs.columns[y][x] + rhs.columns[y][x];
+        }
+    }
+    return *matrix; // return the result by value (uses move constructor)
+}
+
+Matrix operator-(const Matrix& lhs, const Matrix& rhs) // otherwise, both parameters may be const references
+{
+    Matrix* matrix = new Matrix(lhs.COLS, lhs.ROWS);
+
+    matrix->COLS = lhs.COLS;
+    matrix->ROWS = lhs.ROWS;
+
+    for (int y = 0; y < matrix->ROWS; y++) {
+        for (int x = 0; x < matrix->COLS; x++) {
+            matrix->columns[y][x] = lhs.columns[y][x] - rhs.columns[y][x];
         }
     }
     return *matrix; // return the result by value (uses move constructor)
@@ -54,35 +83,34 @@ Matrix& Matrix::operator+=(const Matrix& rhs){
 
     } catch(std::runtime_error& err) {
         std::cerr << err.what() << std::endl;
-        std::cerr << "Addition error with operands of size [" << this->SIZE_X << ", " << this->SIZE_Y << "] and [" << rhs.SIZE_X << ", " << rhs.SIZE_Y << "]"<< std::endl;
+        std::cerr << "Addition error with operands of size [" << this->COLS << ", " << this->ROWS << "] and [" << rhs.COLS << ", " << rhs.ROWS << "]" << std::endl;
         return *this;
     }
 
-    for(int y = 0; y < SIZE_Y; y++) {
-        for(int x = 0; x < SIZE_X; x++) {
+    for(int y = 0; y < ROWS; y++) {
+        for(int x = 0; x < COLS; x++) {
             this->columns[y][x] += rhs.columns[y][x];
         }
     }
     return *this;
 }
 
-
 Matrix::~Matrix() {
-    for (int i = 0; i < SIZE_X; i++) {
+    for (int i = 0; i < ROWS; i++) {
         delete columns[i];
     }
     delete columns;
 }
 
-int Matrix::GetElement(int x, int y) {
+int Matrix::GetElement(int col, int row) {
     try {
-        this->CheckIfValidIndex(x, y);
+        this->CheckIfValidIndex(col, row);
     } catch(std::runtime_error& err) {
         std::cerr << err.what() << std::endl;
-        std::cerr << "Get element error with operands of size [" << this->SIZE_X << ", " << this->SIZE_Y << "] and indices [" << x << ", " << y << "]"<< std::endl;
+        std::cerr << "Get element error with operands of size [" << this->COLS << ", " << this->ROWS << "] and indices [" << col << ", " << row << "]" << std::endl;
         return 0;
     }
-    return this->columns[y][x];
+    return this->columns[row][col];
 }
 
 void Matrix::SetElement(int x, int y, int value) {
@@ -90,35 +118,35 @@ void Matrix::SetElement(int x, int y, int value) {
         this->CheckIfValidIndex(x, y);
     } catch(std::runtime_error& err) {
         std::cerr << err.what() << std::endl;
-        std::cerr << "Set element error with operands of size [" << this->SIZE_X << ", " << this->SIZE_Y << "] and indices [" << x << ", " << y << "]"<< std::endl;
+        std::cerr << "Set element error with operands of size [" << this->COLS << ", " << this->ROWS << "] and indices [" << x << ", " << y << "]" << std::endl;
     }
     this->columns[y][x] = value;
 }
 
 void Matrix::CheckIfSizeEqual(const Matrix &other) {
-    if(other.SIZE_X != this->SIZE_X && other.SIZE_Y != this->SIZE_Y) {
+    if(other.COLS != this->COLS && other.ROWS != this->ROWS) {
         throw std::runtime_error(std::string("Wrong operands: incorrect width and height"));
     }
 
-    if(other.SIZE_X != this->SIZE_X) {
+    if(other.COLS != this->COLS) {
         throw std::runtime_error(std::string("Wrong operands: incorrect width, correct height"));
     }
 
-    if(other.SIZE_Y != this->SIZE_Y) {
+    if(other.ROWS != this->ROWS) {
         throw std::runtime_error(std::string("Wrong operands: correct width, incorrect height"));
     }
 }
 
 void Matrix::CheckIfValidIndex(int x, int y) {
-    if(x > this->SIZE_X && y > this->SIZE_Y) {
+    if(x > this->COLS && y > this->ROWS) {
         throw std::runtime_error(std::string("Wrong indices: too large width and height"));
     }
 
-    if(x > this->SIZE_X) {
+    if(x > this->COLS) {
         throw std::runtime_error(std::string("Wrong index: too large width, correct height"));
     }
 
-    if(y > this->SIZE_Y) {
+    if(y > this->ROWS) {
         throw std::runtime_error(std::string("Wrong index: correct width, too large height"));
     }
 
@@ -128,10 +156,10 @@ void Matrix::CheckIfValidIndex(int x, int y) {
 }
 
 Matrix* Matrix::LowerTriangle() {
-    Matrix* triangle = new Matrix(SIZE_X, SIZE_Y);
+    Matrix* triangle = new Matrix(COLS, ROWS);
 
-    for (int y = 0; y < SIZE_Y; y++) {
-        for (int x = 0; x < SIZE_X; x++) {
+    for (int y = 0; y < ROWS; y++) {
+        for (int x = 0; x < COLS; x++) {
             if(y > x) {
                 triangle->SetElement(x, y, this->columns[y][x]);
             }
@@ -142,10 +170,10 @@ Matrix* Matrix::LowerTriangle() {
 }
 
 Matrix* Matrix::UpperTriangle() {
-    Matrix* triangle = new Matrix(SIZE_X, SIZE_Y);
+    Matrix* triangle = new Matrix(COLS, ROWS);
 
-    for (int y = 0; y < SIZE_Y; y++) {
-        for (int x = 0; x < SIZE_X; x++) {
+    for (int y = 0; y < ROWS; y++) {
+        for (int x = 0; x < COLS; x++) {
             if(y < x) {
                 triangle->SetElement(x, y, this->columns[y][x]);
             }
@@ -156,10 +184,10 @@ Matrix* Matrix::UpperTriangle() {
 }
 
 Matrix* Matrix::Diagonal() {
-    Matrix* diagonal = new Matrix(SIZE_X, SIZE_Y);
+    Matrix* diagonal = new Matrix(COLS, ROWS);
 
-    for (int y = 0; y < SIZE_Y; y++) {
-        for (int x = 0; x < SIZE_X; x++) {
+    for (int y = 0; y < ROWS; y++) {
+        for (int x = 0; x < COLS; x++) {
             if(y == x) {
                 diagonal->SetElement(x, y, this->columns[y][x]);
             }
@@ -171,24 +199,20 @@ Matrix* Matrix::Diagonal() {
 
 Matrix operator*(const Matrix& lhs, const Matrix& rhs) // otherwise, both parameters may be const references
 {
-    Matrix* matrix = new Matrix(lhs.SIZE_X, rhs.SIZE_Y);
+    Matrix* matrix = new Matrix(rhs.COLS, lhs.ROWS);
 
-    if(lhs.SIZE_Y != rhs.SIZE_X) {
-        std::cerr << "Multiplication error with operands of size [" << lhs.SIZE_X << ", " << lhs.SIZE_Y << "] and [" << rhs.SIZE_X << ", " << rhs.SIZE_Y << "]"<< std::endl;
+    if(lhs.COLS != rhs.ROWS) {
+        std::cerr << "Multiplication error with operands of size [" << lhs.ROWS << ", " << lhs.COLS << "] and [" << rhs.ROWS << ", " << rhs.COLS << "]" << std::endl;
         std::cerr << "Size Y of first operand must be the same as size X of the second one" << std::endl;
         return *matrix;
     }
 
-
-    matrix->SIZE_X = lhs.SIZE_X;
-    matrix->SIZE_Y = lhs.SIZE_Y;
-
     int sum;
 
-    for(int i = 0; i < lhs.SIZE_X; i++) {
-        for(int j = 0; j < rhs.SIZE_Y; j++) {
+    for(int i = 0; i < lhs.ROWS; i++) {
+        for(int j = 0; j < rhs.COLS; j++) {
             sum = 0;
-            for(int k = 0; k < lhs.SIZE_Y; k++) {
+            for(int k = 0; k < lhs.COLS; k++) {
                 sum += lhs.columns[i][k] * rhs.columns[k][j];
             }
             matrix->columns[i][j] = sum;
@@ -200,30 +224,30 @@ Matrix operator*(const Matrix& lhs, const Matrix& rhs) // otherwise, both parame
 
 Matrix& Matrix::operator*=(const Matrix& rhs) {
 
-    Matrix new_matrix = Matrix(this->SIZE_X, rhs.SIZE_Y);
+    Matrix new_matrix = Matrix(this->COLS, rhs.ROWS);
 
-    if(this->SIZE_Y != rhs.SIZE_X) {
-        std::cerr << "Multiplication error with operands of size [" << this->SIZE_X << ", " << this->SIZE_Y << "] and [" << rhs.SIZE_X << ", " << rhs.SIZE_Y << "]"<< std::endl;
+    if(this->ROWS != rhs.COLS) {
+        std::cerr << "Multiplication error with operands of size [" << this->COLS << ", " << this->ROWS << "] and [" << rhs.COLS << ", " << rhs.ROWS << "]" << std::endl;
         std::cerr << "Size Y of first operand must be the same as size X of the second one" << std::endl;
         return new_matrix;
     }
 
     int sum;
 
-    for(int i = 0; i < SIZE_X; i++) {
-        for(int j = 0; j < rhs.SIZE_Y; j++) {
+    for(int i = 0; i < COLS; i++) {
+        for(int j = 0; j < rhs.ROWS; j++) {
             sum = 0;
-            for(int k = 0; k < SIZE_Y; k++) {
+            for(int k = 0; k < ROWS; k++) {
                 sum += columns[i][k] * rhs.columns[k][j];
             }
             new_matrix.columns[i][j] = sum;
         }
     }
 
-    this->SIZE_X = new_matrix.SIZE_X;
-    this->SIZE_Y = new_matrix.SIZE_Y;
-    for (int y = 0; y < SIZE_Y; y++) {
-        for (int x = 0; x < SIZE_X; x++) {
+    this->COLS = new_matrix.COLS;
+    this->ROWS = new_matrix.ROWS;
+    for (int y = 0; y < ROWS; y++) {
+        for (int x = 0; x < COLS; x++) {
             columns[y][x] = new_matrix.columns[y][x];
         }
     }
@@ -231,10 +255,57 @@ Matrix& Matrix::operator*=(const Matrix& rhs) {
     return *this;
 }
 
-int Matrix::GetSizeY() {
-    return SIZE_Y;
+Matrix operator/(const Matrix& m1, const Matrix& m2) {
+    if (m1.COLS != m2.COLS || m1.ROWS != m2.ROWS) {
+        // handle error: matrices have different sizes
+        throw std::invalid_argument("Matrices have different sizes.");
+    }
+    Matrix result(m1.COLS, m1.ROWS);
+    for (int y = 0; y < m1.ROWS; y++) {
+        for (int x = 0; x < m1.COLS; x++) {
+            if (m2.columns[y][x] == 0) {
+                // handle error: division by zero
+                throw std::invalid_argument("Division by zero.");
+            }
+            result.columns[y][x] = m1.columns[y][x] / m2.columns[y][x];
+        }
+    }
+    return result;
 }
 
-int Matrix::GetSizeX() {
-    return SIZE_X;
+int Matrix::GetSizeY() const{
+    return ROWS;
+}
+
+int Matrix::GetSizeX() const {
+    return COLS;
+}
+
+double Matrix::Norm() const{
+    double sum = 0.0;
+    for (int y = 0; y < ROWS; y++) {
+        for (int x = 0; x < COLS; x++) {
+            sum += columns[y][x] * columns[y][x];
+        }
+    }
+    return sqrt(sum);
+}
+
+Matrix Matrix::forwardSubstitution(const Matrix& b) const {
+    if (COLS != ROWS) {
+        throw std::invalid_argument("Matrix must be square");
+    }
+    Matrix* r = new Matrix(COLS, 1, 0);
+    for (int y = 0; y < COLS; y++) {
+        int sum = 0;
+        for (int x = 0; x < y; x++) {
+            sum += columns[x][y] * r->columns[0][y];
+        }
+        int diagonal = columns[y][y];
+        if (diagonal == 0) {
+            throw std::invalid_argument("Matrix is not lower triangular");
+        }
+        r->columns[0][y] = (b.columns[0][y] - sum) / diagonal;
+    }
+    return *r;
 }
