@@ -25,7 +25,7 @@ public:
     void SetElement(int x, int y, int value);
     int GetSizeX() const;
     int GetSizeY() const;
-    void Print();
+    void Print() const;
     friend Matrix operator+(const Matrix& lhs, const Matrix& rhs);
     friend Matrix operator-(const Matrix& lhs, const Matrix& rhs);
     Matrix& operator+=(const Matrix& rhs);
@@ -34,6 +34,8 @@ public:
     Matrix& operator*=(const Matrix& rhs);
 
     friend Matrix operator/(const Matrix& m1, const Matrix& m2);
+
+    Matrix& operator=(const Matrix& rhs) noexcept;
 
     ~Matrix();
 

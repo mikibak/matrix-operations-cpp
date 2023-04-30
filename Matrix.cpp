@@ -37,7 +37,7 @@ Matrix::Matrix() {
     ROWS = 0;
 }
 
-void Matrix::Print() {
+void Matrix::Print() const{
     for(int y = 0; y < ROWS; y++) {
         for(int x = 0; x < COLS; x++) {
             std::cout << columns[y][x] << "   ";
@@ -113,14 +113,14 @@ int Matrix::GetElement(int col, int row) {
     return this->columns[row][col];
 }
 
-void Matrix::SetElement(int x, int y, int value) {
+void Matrix::SetElement(int col, int row, int value) {
     try {
-        this->CheckIfValidIndex(x, y);
+        this->CheckIfValidIndex(col, row);
     } catch(std::runtime_error& err) {
         std::cerr << err.what() << std::endl;
-        std::cerr << "Set element error with operands of size [" << this->COLS << ", " << this->ROWS << "] and indices [" << x << ", " << y << "]" << std::endl;
+        std::cerr << "Set element error with operands of size [" << this->COLS << ", " << this->ROWS << "] and indices [" << col << ", " << row << "]" << std::endl;
     }
-    this->columns[y][x] = value;
+    this->columns[row][col] = value;
 }
 
 void Matrix::CheckIfSizeEqual(const Matrix &other) {
@@ -255,6 +255,19 @@ Matrix& Matrix::operator*=(const Matrix& rhs) {
     return *this;
 }
 
+Matrix& Matrix::operator=(const Matrix& rhs) noexcept {
+
+    this->COLS = rhs.COLS;
+    this->ROWS = rhs.ROWS;
+    for (int y = 0; y < ROWS; y++) {
+        for (int x = 0; x < COLS; x++) {
+            columns[y][x] = rhs.columns[y][x];
+        }
+    }
+
+    return *this;
+}
+
 Matrix operator/(const Matrix& m1, const Matrix& m2) {
     if (m1.COLS != m2.COLS || m1.ROWS != m2.ROWS) {
         // handle error: matrices have different sizes
@@ -295,17 +308,17 @@ Matrix Matrix::forwardSubstitution(const Matrix& b) const {
     if (COLS != ROWS) {
         throw std::invalid_argument("Matrix must be square");
     }
-    Matrix* r = new Matrix(COLS, 1, 0);
-    for (int y = 0; y < COLS; y++) {
+    Matrix* r = new Matrix(1, ROWS, 0);
+    for (int row = 0; row < ROWS; row++) {
         int sum = 0;
-        for (int x = 0; x < y; x++) {
-            sum += columns[x][y] * r->columns[0][y];
+        for (int column = 0; column < row; column++) {
+            sum += columns[row][column] * r->columns[row][0];
         }
-        int diagonal = columns[y][y];
+        int diagonal = columns[row][row];
         if (diagonal == 0) {
             throw std::invalid_argument("Matrix is not lower triangular");
         }
-        r->columns[0][y] = (b.columns[0][y] - sum) / diagonal;
+        r->columns[row][0] = (b.columns[row][0] - sum) / diagonal;
     }
     return *r;
 }

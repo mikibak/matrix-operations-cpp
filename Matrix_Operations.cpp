@@ -8,11 +8,11 @@
 #define MY_SIZE 5//(9 * 6 * 8)
 
 Matrix Jacobi(const Matrix& A, const Matrix& b, const Matrix& L, const Matrix& U, const Matrix& D, int max_iter, double tol) {
-    Matrix x = Matrix(1, MY_SIZE, 1);
+    Matrix r = Matrix(1, MY_SIZE, 1);
     // Jacobi iteration
     for (int k = 0; k < max_iter; k++) {
         // Compute the next approximation
-        Matrix minus_D = Matrix(D.GetSizeX(), D.GetSizeY(), -1) * D;
+        /*Matrix minus_D = Matrix(D.GetSizeX(), D.GetSizeY(), -1) * D;
         Matrix LU = L + U;
         LU.Print();
         x.Print();
@@ -23,19 +23,31 @@ Matrix Jacobi(const Matrix& A, const Matrix& b, const Matrix& L, const Matrix& U
         Matrix sub2 = D.forwardSubstitution(b);
         sub2.Print();
         Matrix x_next = sub1 + sub2;
+*/
+        Matrix minus_D = Matrix(D.GetSizeX(), D.GetSizeY(), -1) * D;
+        r = minus_D.forwardSubstitution((L + U) * r) + D.forwardSubstitution(b);
+
+        double error = (A*r - b).Norm();
+
+        if(error < tol) {
+            b.Print();
+            A.Print();
+            return r;
+        }
 
         // Check if the difference is smaller than the tolerance
-        Matrix m = x_next - x;
+        /*Matrix m = r_next - r;
         if (m.Norm() < tol) {
-            return x_next;
+            r_next.Print();
+            return r;
         }
 
         // Update x
-        x = x_next;
+        r = r_next;*/
     }
 
     // Return the last approximation
-    return x;
+    return r;
 }
 
 
@@ -76,17 +88,19 @@ int main()
     Matrix* A = new BandMatrix(MY_SIZE, MY_SIZE, a1, a2, a3);
     Matrix* b = new Matrix(1, MY_SIZE);
 
-    for(int i = 0; i < MY_SIZE; i++) {
-        int value = sin( i * (8 + 1));
+    for(double i = 0; i < MY_SIZE; i++) {
+        double value = sin( i * (8 + 1));
         b->SetElement(0, i, value);
     }
+
+    b->Print();
 
     Matrix* L = A->LowerTriangle();
     Matrix* U = A->UpperTriangle();
     Matrix* D = A->Diagonal();
 
     Matrix x = Jacobi(*A, *b, *L, *U, *D, 1000, 1e-6);
-
+    x.Print();
     //while(true) {
 
         //r Matrix x_next = -D\(L + U) * r + D\b;
