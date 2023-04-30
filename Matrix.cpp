@@ -26,17 +26,26 @@ Matrix::Matrix() {
 void Matrix::Print() {
     for(int y = 0; y < SIZE_Y; y++) {
         for(int x = 0; x < SIZE_X; x++) {
-            std::cout << columns[y][x];
+            std::cout << columns[y][x] << "   ";
         }
         std::cout << std::endl;
     }
     std::cout << std::endl;
 }
 
-Matrix operator+(Matrix lhs, const Matrix& rhs) // otherwise, both parameters may be const references
+Matrix operator+(const Matrix& lhs, const Matrix& rhs) // otherwise, both parameters may be const references
 {
-    lhs += rhs; // reuse compound assignment
-    return lhs; // return the result by value (uses move constructor)
+    Matrix* matrix = new Matrix(lhs.SIZE_X, lhs.SIZE_Y);
+
+    matrix->SIZE_X = lhs.SIZE_X;
+    matrix->SIZE_Y = lhs.SIZE_Y;
+
+    for (int y = 0; y < matrix->SIZE_Y; y++) {
+        for (int x = 0; x < matrix->SIZE_X; x++) {
+            matrix->columns[y][x] = lhs.columns[y][x] + rhs.columns[y][x];
+        }
+    }
+    return *matrix; // return the result by value (uses move constructor)
 }
 
 Matrix& Matrix::operator+=(const Matrix& rhs){
@@ -158,4 +167,74 @@ Matrix* Matrix::Diagonal() {
     }
 
     return diagonal;
+}
+
+Matrix operator*(const Matrix& lhs, const Matrix& rhs) // otherwise, both parameters may be const references
+{
+    Matrix* matrix = new Matrix(lhs.SIZE_X, rhs.SIZE_Y);
+
+    if(lhs.SIZE_Y != rhs.SIZE_X) {
+        std::cerr << "Multiplication error with operands of size [" << lhs.SIZE_X << ", " << lhs.SIZE_Y << "] and [" << rhs.SIZE_X << ", " << rhs.SIZE_Y << "]"<< std::endl;
+        std::cerr << "Size Y of first operand must be the same as size X of the second one" << std::endl;
+        return *matrix;
+    }
+
+
+    matrix->SIZE_X = lhs.SIZE_X;
+    matrix->SIZE_Y = lhs.SIZE_Y;
+
+    int sum;
+
+    for(int i = 0; i < lhs.SIZE_X; i++) {
+        for(int j = 0; j < rhs.SIZE_Y; j++) {
+            sum = 0;
+            for(int k = 0; k < lhs.SIZE_Y; k++) {
+                sum += lhs.columns[i][k] * rhs.columns[k][j];
+            }
+            matrix->columns[i][j] = sum;
+        }
+    }
+
+    return *matrix; // return the result by value (uses move constructor)
+}
+
+Matrix& Matrix::operator*=(const Matrix& rhs) {
+
+    Matrix new_matrix = Matrix(this->SIZE_X, rhs.SIZE_Y);
+
+    if(this->SIZE_Y != rhs.SIZE_X) {
+        std::cerr << "Multiplication error with operands of size [" << this->SIZE_X << ", " << this->SIZE_Y << "] and [" << rhs.SIZE_X << ", " << rhs.SIZE_Y << "]"<< std::endl;
+        std::cerr << "Size Y of first operand must be the same as size X of the second one" << std::endl;
+        return new_matrix;
+    }
+
+    int sum;
+
+    for(int i = 0; i < SIZE_X; i++) {
+        for(int j = 0; j < rhs.SIZE_Y; j++) {
+            sum = 0;
+            for(int k = 0; k < SIZE_Y; k++) {
+                sum += columns[i][k] * rhs.columns[k][j];
+            }
+            new_matrix.columns[i][j] = sum;
+        }
+    }
+
+    this->SIZE_X = new_matrix.SIZE_X;
+    this->SIZE_Y = new_matrix.SIZE_Y;
+    for (int y = 0; y < SIZE_Y; y++) {
+        for (int x = 0; x < SIZE_X; x++) {
+            columns[y][x] = new_matrix.columns[y][x];
+        }
+    }
+
+    return *this;
+}
+
+int Matrix::GetSizeY() {
+    return SIZE_Y;
+}
+
+int Matrix::GetSizeX() {
+    return SIZE_X;
 }

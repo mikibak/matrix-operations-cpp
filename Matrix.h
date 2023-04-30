@@ -21,9 +21,14 @@ public:
     Matrix(int size_x, int size_y);
     int GetElement(int x, int y);
     void SetElement(int x, int y, int value);
+    int GetSizeX();
+    int GetSizeY();
     void Print();
-    friend Matrix operator+(Matrix lhs, const Matrix& rhs);
+    friend Matrix operator+(const Matrix& lhs, const Matrix& rhs);
     Matrix& operator+=(const Matrix& rhs);
+
+    friend Matrix operator*(const Matrix& lhs, const Matrix& rhs);
+    Matrix& operator*=(const Matrix& rhs);
 
     ~Matrix();
 

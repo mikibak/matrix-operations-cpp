@@ -5,7 +5,7 @@
 #include "Matrix.h"
 #include "BandMatrix.h"
 
-#define MY_SIZE (9 * 6 * 8)
+#define MY_SIZE 5//(9 * 6 * 8)
 
 int main()
 {
@@ -52,7 +52,23 @@ int main()
     Matrix* U = A->UpperTriangle();
     Matrix* D = A->Diagonal();
 
-    L->Print();
-    U->Print();
-    D->Print();
+    Matrix matrix = *A;
+    Matrix matrix2 = *U;
+
+    matrix.Print();
+    matrix2.Print();
+
+    Matrix m = matrix * matrix2;
+
+    m.Print();
+
+    //while(true) {
+
+        //r = -D\(L + U) * r + D\b;
+        //error = norm(M*r - b)
+
+        //if(error < pow(10, -14)) {
+        //    break;
+        //}
+    //}
 }
