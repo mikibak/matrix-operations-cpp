@@ -4,11 +4,14 @@
 #include <cmath>
 #include "Matrix.h"
 #include "BandMatrix.h"
+#include <chrono>
 
-#define MY_SIZE 5//968
+#define MY_SIZE 968
 
 
 Matrix Jacobi(const Matrix& A, const Matrix& b, const Matrix& L, const Matrix& U, const Matrix& D, int max_iter, double tol) {
+    auto start = std::chrono::high_resolution_clock::now();
+
     Matrix r = Matrix(1, MY_SIZE, 1);
     Matrix minus_D = Matrix(D.GetSizeX(), D.GetSizeY());
     Matrix LU = L + U;
@@ -26,16 +29,20 @@ Matrix Jacobi(const Matrix& A, const Matrix& b, const Matrix& L, const Matrix& U
 
         if(error < tol) {
             std::cout << "Number of iterations for Jacobi: " << k << std::endl;
-            return r;
+            break;
         }
     }
 
-    // Return the last approximation
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    std::cout << "Time: " << duration.count() << " ms"  << std::endl;
     return r;
 }
 
 
 Matrix GaussSeidel(const Matrix& A, const Matrix& b, const Matrix& L, const Matrix& U, const Matrix& D, int max_iter, double tol) {
+    auto start = std::chrono::high_resolution_clock::now();
+
     Matrix r = Matrix(1, MY_SIZE, 1);
     Matrix minus_DL = Matrix(D.GetSizeX(), D.GetSizeY());
     Matrix DLforwardSubstitutionb =  (D + L).forwardSubstitution(b);
@@ -57,12 +64,15 @@ Matrix GaussSeidel(const Matrix& A, const Matrix& b, const Matrix& L, const Matr
 
         if(error < tol) {
             std::cout << "Number of iterations for Gauss-Seidel: " << k << std::endl;
-            return r;
+            break;
         }
 
     }
 
-    // Return the last approximation
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    std::cout << "Time: " << duration.count() << " ms"  << std::endl;
     return r;
 }
 
@@ -90,10 +100,10 @@ int main()
     Matrix* D = A->Diagonal();
 
     Matrix x = Jacobi(*A, *b, *L, *U, *D, max_iter, 1e-6);
-    x.Print();
+    //x.Print();
 
     Matrix x2 = GaussSeidel(*A, *b, *L, *U, *D, max_iter, 1e-6);
-    x2.Print();
+    //x2.Print();
     //while(true) {
 
         //r Matrix x_next = -D\(L + U) * r + D\b;
