@@ -9,6 +9,7 @@
 
 Matrix Jacobi(const Matrix& A, const Matrix& b, const Matrix& L, const Matrix& U, const Matrix& D, int max_iter, double tol) {
     Matrix r = Matrix(1, MY_SIZE, 1);
+    Matrix minus_D = Matrix(D.GetSizeX(), D.GetSizeY(), -1) * D;
     // Jacobi iteration
     for (int k = 0; k < max_iter; k++) {
         // Compute the next approximation
@@ -24,14 +25,17 @@ Matrix Jacobi(const Matrix& A, const Matrix& b, const Matrix& L, const Matrix& U
         sub2.Print();
         Matrix x_next = sub1 + sub2;
 */
-        Matrix minus_D = Matrix(D.GetSizeX(), D.GetSizeY(), -1) * D;
         r = minus_D.forwardSubstitution((L + U) * r) + D.forwardSubstitution(b);
 
         double error = (A*r - b).Norm();
 
+        r.Print();
+
         if(error < tol) {
+            std::cout << "Number of iterations for Jacobi: " << k << std::endl;
             b.Print();
             A.Print();
+            r.Print();
             return r;
         }
 
@@ -93,7 +97,7 @@ int main()
         b->SetElement(0, i, value);
     }
 
-    b->Print();
+    //b->Print();
 
     Matrix* L = A->LowerTriangle();
     Matrix* U = A->UpperTriangle();

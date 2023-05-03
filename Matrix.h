@@ -12,7 +12,7 @@ protected:
 
     int COLS;
     int ROWS;
-    int** columns;
+    double** columns;
     void CheckIfSizeEqual(const Matrix &other);
     void CheckIfValidIndex(int x, int y);
 
@@ -21,8 +21,8 @@ public:
     Matrix(int size_x, int size_y);
     Matrix(int size_x, int size_y, int value);
 
-    int GetElement(int x, int y);
-    void SetElement(int x, int y, int value);
+    double GetElement(int x, int y);
+    void SetElement(int x, int y, double value);
     int GetSizeX() const;
     int GetSizeY() const;
     void Print() const;

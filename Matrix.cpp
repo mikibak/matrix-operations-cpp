@@ -10,9 +10,9 @@ Matrix::Matrix(int cols, int rows) {
     COLS = cols;
     ROWS = rows;
 
-    columns = new int* [ROWS];
+    columns = new double* [ROWS];
     for (int row = 0; row < ROWS; row++) {
-        columns[row] = new int[COLS];
+        columns[row] = new double[COLS];
         for (int col = 0; col < COLS; col++) {
             columns[row][col] = 0;
         }
@@ -23,9 +23,9 @@ Matrix::Matrix(int cols, int rows, int value) {
     COLS = cols;
     ROWS = rows;
 
-    columns = new int* [ROWS];
+    columns = new double* [ROWS];
     for (int row = 0; row < ROWS; row++) {
-        columns[row] = new int[COLS];
+        columns[row] = new double[COLS];
         for (int col = 0; col < COLS; col++) {
             columns[row][col] = value;
         }
@@ -102,7 +102,7 @@ Matrix::~Matrix() {
     delete columns;
 }
 
-int Matrix::GetElement(int col, int row) {
+double Matrix::GetElement(int col, int row) {
     try {
         this->CheckIfValidIndex(col, row);
     } catch(std::runtime_error& err) {
@@ -113,7 +113,7 @@ int Matrix::GetElement(int col, int row) {
     return this->columns[row][col];
 }
 
-void Matrix::SetElement(int col, int row, int value) {
+void Matrix::SetElement(int col, int row, double value) {
     try {
         this->CheckIfValidIndex(col, row);
     } catch(std::runtime_error& err) {
@@ -308,7 +308,17 @@ Matrix Matrix::forwardSubstitution(const Matrix& b) const {
     if (COLS != ROWS) {
         throw std::invalid_argument("Matrix must be square");
     }
-    Matrix* r = new Matrix(1, ROWS, 0);
+    Matrix x(1, ROWS, 1); // Initialize the solution vector to 1
+    for (int i = 0; i < ROWS; i++) {
+        double sum = 0;
+        for (int j = 0; j < i; j++) {
+            sum += this->columns[j][i] * x.columns[j][0]; // Calculate the sum of the previous solutions multiplied by the corresponding matrix coefficients
+        }
+        x.columns[i][0] = (b.columns[i][0] - sum) / this->columns[i][i]; // Calculate the ith solution using the updated sum and the ith diagonal coefficient
+    }
+    return x; // Return the solution vector
+}
+    /*Matrix* r = new Matrix(1, ROWS, 0);
     for (int row = 0; row < ROWS; row++) {
         int sum = 0;
         for (int column = 0; column < row; column++) {
@@ -320,5 +330,5 @@ Matrix Matrix::forwardSubstitution(const Matrix& b) const {
         }
         r->columns[row][0] = (b.columns[row][0] - sum) / diagonal;
     }
-    return *r;
-}
+    return *r;*/
+//}

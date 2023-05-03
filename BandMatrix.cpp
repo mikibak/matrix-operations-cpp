@@ -4,9 +4,9 @@ BandMatrix::BandMatrix(int sizeX, int sizeY, int a1, int a2, int a3) {
     this->ROWS = sizeY;
     this->COLS = sizeX;
 
-    columns = new int* [ROWS];
+    columns = new double* [ROWS];
     for(int y = 0; y < ROWS; y++) {
-        columns[y] = new int[COLS];
+        columns[y] = new double[COLS];
         for(int x = 0; x < COLS; x++) {
             if(x == y) {
                 //main diagonal
