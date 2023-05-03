@@ -102,7 +102,7 @@ Matrix::~Matrix() {
     delete columns;
 }
 
-double Matrix::GetElement(int col, int row) {
+double Matrix::GetElement(int col, int row) const{
     try {
         this->CheckIfValidIndex(col, row);
     } catch(std::runtime_error& err) {
@@ -123,7 +123,7 @@ void Matrix::SetElement(int col, int row, double value) {
     this->columns[row][col] = value;
 }
 
-void Matrix::CheckIfSizeEqual(const Matrix &other) {
+void Matrix::CheckIfSizeEqual(const Matrix &other) const{
     if(other.COLS != this->COLS && other.ROWS != this->ROWS) {
         throw std::runtime_error(std::string("Wrong operands: incorrect width and height"));
     }
@@ -137,7 +137,7 @@ void Matrix::CheckIfSizeEqual(const Matrix &other) {
     }
 }
 
-void Matrix::CheckIfValidIndex(int x, int y) {
+void Matrix::CheckIfValidIndex(int x, int y) const{
     if(x > this->COLS && y > this->ROWS) {
         throw std::runtime_error(std::string("Wrong indices: too large width and height"));
     }
@@ -207,7 +207,7 @@ Matrix operator*(const Matrix& lhs, const Matrix& rhs) // otherwise, both parame
         return *matrix;
     }
 
-    int sum;
+    double sum;
 
     for(int i = 0; i < lhs.ROWS; i++) {
         for(int j = 0; j < rhs.COLS; j++) {
@@ -232,7 +232,7 @@ Matrix& Matrix::operator*=(const Matrix& rhs) {
         return new_matrix;
     }
 
-    int sum;
+    double sum;
 
     for(int i = 0; i < COLS; i++) {
         for(int j = 0; j < rhs.ROWS; j++) {
@@ -308,15 +308,26 @@ Matrix Matrix::forwardSubstitution(const Matrix& b) const {
     if (COLS != ROWS) {
         throw std::invalid_argument("Matrix must be square");
     }
-    Matrix x(1, ROWS, 1); // Initialize the solution vector to 1
-    for (int i = 0; i < ROWS; i++) {
+    Matrix x(1, ROWS, 0); // Initialize the solution vector to 0
+
+    for(int i = 0; i < ROWS; i++) {
+        double s = 0;
+        for(int j = 0; j < i; j++) {
+            s = s + this->columns[i][j] * x.columns[j][0];
+        }
+        x.columns[i][0] = (b.columns[i][0] - s) / this->columns[i][i];
+    }
+
+    return x;
+
+    /*for (int i = 0; i < ROWS; i++) {
         double sum = 0;
         for (int j = 0; j < i; j++) {
             sum += this->columns[j][i] * x.columns[j][0]; // Calculate the sum of the previous solutions multiplied by the corresponding matrix coefficients
         }
         x.columns[i][0] = (b.columns[i][0] - sum) / this->columns[i][i]; // Calculate the ith solution using the updated sum and the ith diagonal coefficient
     }
-    return x; // Return the solution vector
+    return x; // Return the solution vector*/
 }
     /*Matrix* r = new Matrix(1, ROWS, 0);
     for (int row = 0; row < ROWS; row++) {

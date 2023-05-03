@@ -13,15 +13,15 @@ protected:
     int COLS;
     int ROWS;
     double** columns;
-    void CheckIfSizeEqual(const Matrix &other);
-    void CheckIfValidIndex(int x, int y);
+    void CheckIfSizeEqual(const Matrix &other) const;
+    void CheckIfValidIndex(int x, int y) const;
 
 
 public:
     Matrix(int size_x, int size_y);
     Matrix(int size_x, int size_y, int value);
 
-    double GetElement(int x, int y);
+    double GetElement(int x, int y) const;
     void SetElement(int x, int y, double value);
     int GetSizeX() const;
     int GetSizeY() const;

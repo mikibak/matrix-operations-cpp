@@ -5,31 +5,37 @@
 #include "Matrix.h"
 #include "BandMatrix.h"
 
-#define MY_SIZE 5//(9 * 6 * 8)
+#define MY_SIZE 5//968
+
 
 Matrix Jacobi(const Matrix& A, const Matrix& b, const Matrix& L, const Matrix& U, const Matrix& D, int max_iter, double tol) {
     Matrix r = Matrix(1, MY_SIZE, 1);
-    Matrix minus_D = Matrix(D.GetSizeX(), D.GetSizeY(), -1) * D;
+    Matrix minus_D = Matrix(D.GetSizeX(), D.GetSizeY());
+    for(int i = 0; i < MY_SIZE; i++) {
+        minus_D.SetElement(i, i, -1 *D.GetElement(i, i));
+    }
+    minus_D.Print();
+    D.Print();
     // Jacobi iteration
     for (int k = 0; k < max_iter; k++) {
-        // Compute the next approximation
-        /*Matrix minus_D = Matrix(D.GetSizeX(), D.GetSizeY(), -1) * D;
-        Matrix LU = L + U;
-        LU.Print();
-        x.Print();
-        Matrix LUx = LU * x;
-        LUx.Print();
-        Matrix sub1 = minus_D.forwardSubstitution(LUx);
+        r.Print();
+        Matrix lu = L + U;
+        Matrix lur = lu * r;
+        lur.Print();
+        Matrix sub1 = minus_D.forwardSubstitution(lur);
+        std::cout << "pierwsze: ";
         sub1.Print();
         Matrix sub2 = D.forwardSubstitution(b);
+        std::cout << "drugie: ";
         sub2.Print();
-        Matrix x_next = sub1 + sub2;
-*/
         r = minus_D.forwardSubstitution((L + U) * r) + D.forwardSubstitution(b);
+
+        std::cout << "r: ";
+        r.Print();
 
         double error = (A*r - b).Norm();
 
-        r.Print();
+
 
         if(error < tol) {
             std::cout << "Number of iterations for Jacobi: " << k << std::endl;
