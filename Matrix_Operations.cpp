@@ -67,6 +67,9 @@ Matrix LuDecomposition(const Matrix& A, const Matrix& b) {
         //x[i] = (y[i] - S) / U->A[i][i];
     }
 
+    double error = (A*x - b).Norm();
+    std::cout << "Residual error norm for LU decomposition: " << error << std::endl;
+
     return x;
 
     //auto end = chrono::high_resolution_clock::now();
@@ -200,15 +203,21 @@ void ValuesForPlots(Matrix* A, Matrix* b, int max_iter, double tol, int a1, int 
     }
 
     //export to csv
+    bool comma = false;
     std::ofstream out("/home/mikibak/matrix-operations-cpp/GaussSeidel.csv");
-    for (auto col : GaussSeidelIter)
-        out << col <<',';
-    out << '\n';
+    for (auto col : GaussSeidelIter) {
+        if (comma) out << ',';
+        comma = true;
+        out << col;
+    }
 
+    comma = false;
     std::ofstream out2("/home/mikibak/matrix-operations-cpp/Jacobi.csv");
-    for (auto col : JacobiIter)
-        out2 << col <<',';
-    out2 << '\n';
+    for (auto col : JacobiIter) {
+        if (comma) out2 << ',';
+        comma = true;
+        out2 << col;
+    }
 }
 
 int main()
@@ -254,13 +263,23 @@ int main()
 
 
     //C:
-    /*a1 = 3;
+    a1 = 3;
     a2 = -1;
     a3 = -1;
 
     A = new BandMatrix(MY_SIZE, MY_SIZE, a1, a2, a3);
-    Jacobi(*A, *b, max_iter, 1e-6);
-    GaussSeidel(*A, *b, max_iter, 1e-6);*/
+    //Jacobi(*A, *b, max_iter, 1e-6);
+    //GaussSeidel(*A, *b, max_iter, 1e-6);
+
+    //GAUSS-SEIDEL:
+
+    start = std::chrono::high_resolution_clock::now();
+
+    LuDecomposition(*A, *b);
+
+    stop = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    std::cout << "LU decomposition time: " << duration.count() << " ms"  << std::endl;
 
     ValuesForPlots(A, b, max_iter, 1e-6, a1, a2, a3);
 
