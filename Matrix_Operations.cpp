@@ -14,33 +14,76 @@ char path[] = "/home/mikibak/matrix-operations-cpp/plots/error0.csv";
 //47
 
 Matrix LuDecomposition(const Matrix& A, const Matrix& b) {
-    Matrix U = A.UpperTriangle() + A.Diagonal();
-    Matrix L = A.LowerTriangle() + A.Diagonal();
-
     int N = A.GetSizeX();
 
-    //auto start = chrono::high_resolution_clock::now();
+    Matrix L(N, N, 0);
+    Matrix U(N, N, 0);
 
-    /* creating matrices L and U, such that A = L * U */
-    for (int i = 0; i < N - 1; i++)		//columns
+    for (int i = 0; i < N; i++)
+        L.SetElement(i, i, 1.0);
+
+    /*for (int j = 0; j < N; j++) {
+        for (int i = 0; i <= j; i++) {
+            double value = A.GetElement(j, i);
+            U.SetElement(j, i, U.GetElement(j, i) + value);
+            //U[i][j] += A[i][j];
+            for (int k = 0; k <= i - 1; k++) {
+                double value1 = L.GetElement(k, i) * U.GetElement(j, k);
+                U.SetElement(j, i, U.GetElement(j, i) - value1);
+            }
+            //U[i][j] -= L[i][k] * U[k][j];
+
+        }
+
+        for (int i = j+1; i < N; i++) {
+            double Lij = L.GetElement(j, i);
+            for (int k = 0; k <= j - 1; k++) {
+                L.SetElement(j, i, Lij - L.GetElement(k, i) * U.GetElement(j, k));
+                //L[i][j] -= L[i][k] * U[k][j];
+            }
+            L.SetElement(j, i, Lij + A.GetElement(j, i));
+            L.SetElement(j, i, Lij / U.GetElement(j, j));
+            //L[i][j] += A[i][j];
+            //L[i][j] /= U[j][j];
+        }
+    }*/
+
+    //Doolittle
+    for (int i = 0; i < N; i++)
     {
-        for (int j = i + 1; j < N; j++)	//rows
+        // Upper Triangular
+        for (int k = i; k < N; k++)
         {
-            //L->A[j][i] = U->A[j][i] / U->A[i][i];
-            double value = U.GetElement(j, i) / U.GetElement(i, i);
-            L.SetElement(j, i, value);
+            // Summation of L(i, j) * U(j, k)
+            double sum = 0;
+            for (int j = 0; j < i; j++)
+                sum += (L.GetElement(j, i) * U.GetElement(k, j));
 
-            for (int k = i; k < N; k++) {
-                //U->A[j][k] = U->A[j][k] - L->A[j][i] * U->A[i][k];
-                double v = U.GetElement(j, k) - L.GetElement(j, i) * U.GetElement(i, k);
-                U.SetElement(j, k, v);
+            // Evaluating U(i, k)
+            U.SetElement(k, i, A.GetElement(k, i) - sum);
+        }
+
+        // Lower Triangular
+        for (int k = i; k < N; k++)
+        {
+            if (i == k)
+                L.SetElement(i, i, 1); // Diagonal as 1
+            else
+            {
+                // Summation of L(k, j) * U(j, i)
+                double sum = 0;
+                for (int j = 0; j < i; j++)
+                    sum += (L.GetElement(j, k) * U.GetElement(i, j));
+
+                // Evaluating L(k, i)
+                L.SetElement(i, k, (A.GetElement(i, k) - sum) / U.GetElement(i, i));
             }
         }
     }
-    /* now the main equation to solve may be defined as L * U * x = b  */
 
     L.Print();
     U.Print();
+    (L*U).Print();
 
     /* solving equation L * y = b for y using forward substitution method */
     Matrix x = Matrix(1, A.GetSizeY(), 0);
@@ -53,7 +96,7 @@ Matrix LuDecomposition(const Matrix& A, const Matrix& b) {
         for (int j = 0; j < i; j++) {
             S += L.GetElement(i, j) * y.GetElement(0, j);
         }
-            //S += L->A[i][j] * y[j];
+        //S += L->A[i][j] * y[j];
 
         //y[i] = (b[i] - S) / L->A[i][i];
         double value = (b.GetElement(0, 1) - S) / L.GetElement(i, i);
@@ -73,6 +116,28 @@ Matrix LuDecomposition(const Matrix& A, const Matrix& b) {
         x.SetElement(0, i, value);
         //x[i] = (y[i] - S) / U->A[i][i];
     }
+
+    /*  //Podstawienie w przód dla Ly = b
+      for (int i = 0; i < N; i++) {
+          double val = b.GetElement(i, 0);//b[i][0];
+          for (int j = 0; j < i; j++) {
+              if (j != i) val -= L.GetElement(i, j) * y.GetElement(j, 0);//L[i][j] * y[j][0];
+          }
+
+          y.SetElement(i, 0, val/L.GetElement(i, i));
+          //y[i][0] = val / L[i][i];
+      }
+
+      //Podstawienie wstecz dla Ux = y
+      for (int i = N - 1; i >= 0; i--) {
+          double val = y.GetElement(i, 0);//y[i][0];
+          for (int j = i; j < N; j++) {
+              if (j != i) val -= U.GetElement(i, j) * x.GetElement(j, 0);//U[i][j] * x[j][0];
+          }
+
+          x.SetElement(i, 0, val/U.GetElement(i, i));
+          //x[i][0] = val / U[i][i];
+      }*/
 
     double error = (A*x - b).Norm();
     std::cout << "Residual error norm for LU decomposition: " << error << std::endl;
