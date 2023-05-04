@@ -7,7 +7,7 @@
 #include <chrono>
 #include <fstream>
 
-#define MY_SIZE 968
+#define MY_SIZE 5//968
 
 char filenumber = '0';
 char path[] = "/home/mikibak/matrix-operations-cpp/plots/error0.csv";
@@ -39,8 +39,8 @@ Matrix LuDecomposition(const Matrix& A, const Matrix& b) {
     }
     /* now the main equation to solve may be defined as L * U * x = b  */
 
-    //L.Print();
-    //U.Print();
+    L.Print();
+    U.Print();
 
     /* solving equation L * y = b for y using forward substitution method */
     Matrix x = Matrix(1, A.GetSizeY(), 0);
@@ -293,9 +293,7 @@ int main()
     //JACOBI:
 
     auto start = std::chrono::high_resolution_clock::now();
-
     Matrix x = Jacobi(*A, *b, max_iter, 1e-6, true);
-
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     std::cout << "Time: " << duration.count() << " ms"  << std::endl;
@@ -305,13 +303,12 @@ int main()
     //GAUSS-SEIDEL:
 
     start = std::chrono::high_resolution_clock::now();
-
     Matrix x2 = GaussSeidel(*A, *b, max_iter, 1e-6, true);
-
     stop = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     std::cout << "Time: " << duration.count() << " ms"  << std::endl;
     //x2.Print();
+
 
     ValuesForPlots(A, b, max_iter, 1e-6, a1, a2, a3);
 
@@ -321,20 +318,18 @@ int main()
     a2 = -1;
     a3 = -1;
 
-    A = new BandMatrix(MY_SIZE, MY_SIZE, a1, a2, a3);
+    /*A = new BandMatrix(MY_SIZE, MY_SIZE, a1, a2, a3);
     Jacobi(*A, *b, max_iter, 1e-6, true);
     GaussSeidel(*A, *b, max_iter, 1e-6, true);
-    //std::cout << "Metody nie zbiegają się!" << std::endl;
+    std::cout << "Metody nie zbiegają się!" << std::endl;*/
 
-    //GAUSS-SEIDEL:
+    //LU:
 
     start = std::chrono::high_resolution_clock::now();
-
     Matrix LU_result = LuDecomposition(*A, *b);
-
     stop = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    //LU_result.Print();
+    LU_result.Print();
     std::cout << "LU decomposition time: " << duration.count() << " ms"  << std::endl;
 
 }

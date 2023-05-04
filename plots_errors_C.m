@@ -5,8 +5,8 @@ close all
 ErrorJacobi = csvread('/home/mikibak/matrix-operations-cpp/plots/error2.csv')
 ErrorGaussSeidel = csvread('/home/mikibak/matrix-operations-cpp/plots/error3.csv')
 hold on
-semilogy(ErrorJacobi);
-semilogy(ErrorGaussSeidel);
+semilogy(1:1000, ErrorJacobi);
+semilogy(1:1000, ErrorGaussSeidel);
 legend('Jacobi', 'GaussSeidel');
 title("C: Residual error norm");
 ylabel("error");
