@@ -7,8 +7,8 @@ N = [100, 500, 1000, 2000, 3000];
 GaussSeidel = csvread('GaussSeidel.csv')
 Jacobi = csvread('Jacobi.csv')
 
-hold on
 semilogy(N, GaussSeidel);
+hold on
 semilogy(N, Jacobi);
 legend('GaussSeidel', 'Jacobi');
 title("B:Time of execution");

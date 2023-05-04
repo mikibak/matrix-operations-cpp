@@ -7,7 +7,7 @@
 #include <chrono>
 #include <fstream>
 
-#define MY_SIZE 5//968
+#define MY_SIZE 968
 
 char filenumber = '0';
 char path[] = "/home/mikibak/matrix-operations-cpp/plots/error0.csv";
@@ -81,9 +81,9 @@ Matrix LuDecomposition(const Matrix& A, const Matrix& b) {
         }
     }
 
-    L.Print();
-    U.Print();
-    (L*U).Print();
+    //L.Print();
+    //U.Print();
+    //(L*U).Print();
 
     /* solving equation L * y = b for y using forward substitution method */
     Matrix x = Matrix(1, A.GetSizeY(), 0);
@@ -394,7 +394,7 @@ int main()
     Matrix LU_result = LuDecomposition(*A, *b);
     stop = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-    LU_result.Print();
+    //LU_result.Print();
     std::cout << "LU decomposition time: " << duration.count() << " ms"  << std::endl;
 
 }
