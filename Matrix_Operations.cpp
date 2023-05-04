@@ -94,12 +94,12 @@ Matrix LuDecomposition(const Matrix& A, const Matrix& b) {
         double S = 0;
 
         for (int j = 0; j < i; j++) {
-            S += L.GetElement(i, j) * y.GetElement(0, j);
+            S += L.GetElement(j, i) * y.GetElement(0, j);
         }
         //S += L->A[i][j] * y[j];
 
         //y[i] = (b[i] - S) / L->A[i][i];
-        double value = (b.GetElement(0, 1) - S) / L.GetElement(i, i);
+        double value = (b.GetElement(0, i) - S) / L.GetElement(i, i);
         y.SetElement(0, i, value);
     }
 
@@ -109,7 +109,7 @@ Matrix LuDecomposition(const Matrix& A, const Matrix& b) {
         double S = 0;
 
         for (int j = i + 1; j < N; j++) {
-            S += U.GetElement(i, j);
+            S += U.GetElement(j, i) * x.GetElement(0, j);
         } //S += U->A[i][j] * x[j];
 
         double value = (y.GetElement(0, i) - S) / U.GetElement(i, i);
