@@ -9,6 +9,10 @@
 
 #define MY_SIZE 968
 
+char filenumber = '0';
+char path[] = "/home/mikibak/matrix-operations-cpp/plots/error0.csv";
+//47
+
 Matrix LuDecomposition(const Matrix& A, const Matrix& b) {
     Matrix U = A.UpperTriangle() + A.Diagonal();
     Matrix L = A.LowerTriangle() + A.Diagonal();
@@ -18,15 +22,15 @@ Matrix LuDecomposition(const Matrix& A, const Matrix& b) {
     //auto start = chrono::high_resolution_clock::now();
 
     /* creating matrices L and U, such that A = L * U */
-    for (int i = 0; i < N - 1; ++i)		//columns
+    for (int i = 0; i < N - 1; i++)		//columns
     {
-        for (int j = i + 1; j < N; ++j)	//rows
+        for (int j = i + 1; j < N; j++)	//rows
         {
             //L->A[j][i] = U->A[j][i] / U->A[i][i];
             double value = U.GetElement(j, i) / U.GetElement(i, i);
             L.SetElement(j, i, value);
 
-            for (int k = i; k < N; ++k) {
+            for (int k = i; k < N; k++) {
                 //U->A[j][k] = U->A[j][k] - L->A[j][i] * U->A[i][k];
                 double v = U.GetElement(j, k) - L.GetElement(j, i) * U.GetElement(i, k);
                 U.SetElement(j, k, v);
@@ -35,15 +39,18 @@ Matrix LuDecomposition(const Matrix& A, const Matrix& b) {
     }
     /* now the main equation to solve may be defined as L * U * x = b  */
 
+    //L.Print();
+    //U.Print();
+
     /* solving equation L * y = b for y using forward substitution method */
     Matrix x = Matrix(1, A.GetSizeY(), 0);
     Matrix y = Matrix(1, A.GetSizeY(), 0);
 
-    for (int i = 0; i < N; ++i)
+    for (int i = 0; i < N; i++)
     {
         double S = 0;
 
-        for (int j = 0; j < i; ++j) {
+        for (int j = 0; j < i; j++) {
             S += L.GetElement(i, j) * y.GetElement(0, j);
         }
             //S += L->A[i][j] * y[j];
@@ -54,11 +61,11 @@ Matrix LuDecomposition(const Matrix& A, const Matrix& b) {
     }
 
     /* solving equation U * x = y using backward substitution method */
-    for (int i = N - 1; i >= 0; --i)
+    for (int i = N - 1; i >= 0; i--)
     {
         double S = 0;
 
-        for (int j = i + 1; j < N; ++j) {
+        for (int j = i + 1; j < N; j++) {
             S += U.GetElement(i, j);
         } //S += U->A[i][j] * x[j];
 
@@ -81,7 +88,13 @@ Matrix LuDecomposition(const Matrix& A, const Matrix& b) {
     //*n = norm(r);
 }
 
-Matrix Jacobi(const Matrix& A, const Matrix& b, int max_iter, double tol) {
+
+Matrix Jacobi(const Matrix& A, const Matrix& b, int max_iter, double tol, bool save) {
+
+    double error[max_iter];
+    for(int i = 0; i < max_iter; i++) {
+        error[i] = 0;
+    }
 
     Matrix L = A.LowerTriangle();
     Matrix U = A.UpperTriangle();
@@ -101,19 +114,42 @@ Matrix Jacobi(const Matrix& A, const Matrix& b, int max_iter, double tol) {
 
         r = minus_D.forwardSubstitution(LU * r) + DforwardSubstitutionb;
 
-        double error = (A*r - b).Norm();
+        error[k] = (A*r - b).Norm();
 
-        if(error < tol) {
+        //std::cout << error[k];
+
+        if(error[k] < tol) {
             break;
         }
+
+        if(k == max_iter - 1) std::cout << "Reached max iter" << std::endl;
     }
 
     if(A.GetSizeX() == MY_SIZE) std::cout << "Number of iterations for Jacobi: " << k << std::endl;
+    //save error for plot
+
+    if(save) {
+        bool comma = false;
+        path[47] = filenumber;
+        std::ofstream out2(path);
+        for (auto col : error) {
+            if (comma) out2 << ',';
+            comma = true;
+            out2 << col;
+        }
+        filenumber++;
+    }
+
     return r;
 }
 
 
-Matrix GaussSeidel(const Matrix& A, const Matrix& b, int max_iter, double tol) {
+Matrix GaussSeidel(const Matrix& A, const Matrix& b, int max_iter, double tol, bool save) {
+
+    double error[max_iter];
+    for(int i = 0; i < max_iter; i++) {
+        error[i] = 0;
+    }
 
     Matrix L = A.LowerTriangle();
     Matrix U = A.UpperTriangle();
@@ -137,21 +173,37 @@ Matrix GaussSeidel(const Matrix& A, const Matrix& b, int max_iter, double tol) {
         //r = -(D+L) \ (U*r) + (D+L) \ b;
         r = minus_DL.forwardSubstitution(U * r) + DLforwardSubstitutionb;
 
-        double error = (A*r - b).Norm();
+        error[k] = (A*r - b).Norm();
 
-        if(error < tol) {
+        if(error[k] < tol) {
             break;
         }
 
+        if(k == max_iter - 1) std::cout << "Reached max iter" << std::endl;
     }
 
     if(A.GetSizeX() == MY_SIZE) std::cout << "Number of iterations for Gauss-Seidel: " << k << std::endl;
+
+    //save error for plot
+
+    if(save) {
+        bool comma = false;
+        path[47] = filenumber;
+        std::ofstream out2(path);
+        for (auto col : error) {
+            if (comma) out2 << ',';
+            comma = true;
+            out2 << col;
+        }
+        filenumber++;
+    }
+
     return r;
 }
 
 long TimeWrapJacobi(const Matrix& A, const Matrix& b, int max_iter, double tol) {
     auto start = std::chrono::high_resolution_clock::now();
-    Jacobi(A, b, max_iter, tol);
+    Jacobi(A, b, max_iter, tol, false);
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -160,7 +212,7 @@ long TimeWrapJacobi(const Matrix& A, const Matrix& b, int max_iter, double tol) 
 
 long TimeWrapGaussSeidel(const Matrix& A, const Matrix& b, int max_iter, double tol) {
     auto start = std::chrono::high_resolution_clock::now();
-    GaussSeidel(A, b, max_iter, tol);
+    GaussSeidel(A, b, max_iter, tol, false);
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -170,8 +222,8 @@ long TimeWrapGaussSeidel(const Matrix& A, const Matrix& b, int max_iter, double 
 void ValuesForPlots(Matrix* A, Matrix* b, int max_iter, double tol, int a1, int a2, int a3) {
     //N = {100, 500, 1000, 2000, 3000 . . . }
 
-    int N[] = {10, 50, 100, 200, 300};
-    //int N[] = {100, 500, 1000, 2000, 3000};
+    //int N[] = {10, 50, 100, 200, 300};
+    int N[] = {100, 500, 1000, 2000, 3000};
 
     long GaussSeidelIter[5];
     long JacobiIter[5];
@@ -186,7 +238,7 @@ void ValuesForPlots(Matrix* A, Matrix* b, int max_iter, double tol, int a1, int 
             b->SetElement(0, j, value);
         }
         GaussSeidelIter[i] = TimeWrapGaussSeidel(*A, *b, max_iter, 1e-6);
-        std::cout << i << ": " << GaussSeidelIter[i] << " s" << std::endl;
+        std::cout << i << ": " << GaussSeidelIter[i] << " ms" << std::endl;
     }
 
     std::cout << "\n";
@@ -199,7 +251,7 @@ void ValuesForPlots(Matrix* A, Matrix* b, int max_iter, double tol, int a1, int 
             b->SetElement(0, j, value);
         }
         JacobiIter[i] = TimeWrapJacobi(*A, *b, max_iter, 1e-6);
-        std::cout << i << ": " << JacobiIter[i] << " s" << std::endl;
+        std::cout << i << ": " << JacobiIter[i] << " ms" << std::endl;
     }
 
     //export to csv
@@ -242,7 +294,7 @@ int main()
 
     auto start = std::chrono::high_resolution_clock::now();
 
-    Matrix x = Jacobi(*A, *b, max_iter, 1e-6);
+    Matrix x = Jacobi(*A, *b, max_iter, 1e-6, true);
 
     auto stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
@@ -254,12 +306,14 @@ int main()
 
     start = std::chrono::high_resolution_clock::now();
 
-    Matrix x2 = GaussSeidel(*A, *b, max_iter, 1e-6);
+    Matrix x2 = GaussSeidel(*A, *b, max_iter, 1e-6, true);
 
     stop = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
     std::cout << "Time: " << duration.count() << " ms"  << std::endl;
     //x2.Print();
+
+    ValuesForPlots(A, b, max_iter, 1e-6, a1, a2, a3);
 
 
     //C:
@@ -268,19 +322,19 @@ int main()
     a3 = -1;
 
     A = new BandMatrix(MY_SIZE, MY_SIZE, a1, a2, a3);
-    //Jacobi(*A, *b, max_iter, 1e-6);
-    //GaussSeidel(*A, *b, max_iter, 1e-6);
+    Jacobi(*A, *b, max_iter, 1e-6, true);
+    GaussSeidel(*A, *b, max_iter, 1e-6, true);
+    //std::cout << "Metody nie zbiegają się!" << std::endl;
 
     //GAUSS-SEIDEL:
 
     start = std::chrono::high_resolution_clock::now();
 
-    LuDecomposition(*A, *b);
+    Matrix LU_result = LuDecomposition(*A, *b);
 
     stop = std::chrono::high_resolution_clock::now();
     duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    //LU_result.Print();
     std::cout << "LU decomposition time: " << duration.count() << " ms"  << std::endl;
-
-    ValuesForPlots(A, b, max_iter, 1e-6, a1, a2, a3);
 
 }

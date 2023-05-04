@@ -1,0 +1,11 @@
+ErrorJacobi = csvread('/home/mikibak/matrix-operations-cpp/plots/error0.csv')
+ErrorGaussSeidel = csvread('/home/mikibak/matrix-operations-cpp/plots/error1.csv')
+hold on
+plot(1:1000, ErrorJacobi);
+plot(1:1000, ErrorGaussSeidel);
+legend('Jacobi', 'GaussSeidel');
+title("Residual error norm");
+ylabel("error");
+xlabel("iteration");
+hold off
+saveas(gcf, '/home/mikibak/matrix-operations-cpp/plots/errors.png');
