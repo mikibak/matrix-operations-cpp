@@ -39,11 +39,9 @@ public:
 
     ~Matrix();
 
-    Matrix *LowerTriangle();
-
-    Matrix *UpperTriangle();
-
-    Matrix *Diagonal();
+    Matrix LowerTriangle() const;
+    Matrix UpperTriangle() const;
+    Matrix Diagonal() const;
 
     double Norm() const;
 

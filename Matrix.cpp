@@ -155,7 +155,7 @@ void Matrix::CheckIfValidIndex(int x, int y) const{
     }
 }
 
-Matrix* Matrix::LowerTriangle() {
+Matrix Matrix::LowerTriangle() const {
     Matrix* triangle = new Matrix(COLS, ROWS);
 
     for (int y = 0; y < ROWS; y++) {
@@ -166,10 +166,10 @@ Matrix* Matrix::LowerTriangle() {
         }
     }
 
-    return triangle;
+    return *triangle;
 }
 
-Matrix* Matrix::UpperTriangle() {
+Matrix Matrix::UpperTriangle() const {
     Matrix* triangle = new Matrix(COLS, ROWS);
 
     for (int y = 0; y < ROWS; y++) {
@@ -180,10 +180,10 @@ Matrix* Matrix::UpperTriangle() {
         }
     }
 
-    return triangle;
+    return *triangle;
 }
 
-Matrix* Matrix::Diagonal() {
+Matrix Matrix::Diagonal() const {
     Matrix* diagonal = new Matrix(COLS, ROWS);
 
     for (int y = 0; y < ROWS; y++) {
@@ -194,7 +194,7 @@ Matrix* Matrix::Diagonal() {
         }
     }
 
-    return diagonal;
+    return *diagonal;
 }
 
 Matrix operator*(const Matrix& lhs, const Matrix& rhs) // otherwise, both parameters may be const references
@@ -320,26 +320,4 @@ Matrix Matrix::forwardSubstitution(const Matrix& b) const {
 
     return x;
 
-    /*for (int i = 0; i < ROWS; i++) {
-        double sum = 0;
-        for (int j = 0; j < i; j++) {
-            sum += this->columns[j][i] * x.columns[j][0]; // Calculate the sum of the previous solutions multiplied by the corresponding matrix coefficients
-        }
-        x.columns[i][0] = (b.columns[i][0] - sum) / this->columns[i][i]; // Calculate the ith solution using the updated sum and the ith diagonal coefficient
-    }
-    return x; // Return the solution vector*/
 }
-    /*Matrix* r = new Matrix(1, ROWS, 0);
-    for (int row = 0; row < ROWS; row++) {
-        int sum = 0;
-        for (int column = 0; column < row; column++) {
-            sum += columns[row][column] * r->columns[row][0];
-        }
-        int diagonal = columns[row][row];
-        if (diagonal == 0) {
-            throw std::invalid_argument("Matrix is not lower triangular");
-        }
-        r->columns[row][0] = (b.columns[row][0] - sum) / diagonal;
-    }
-    return *r;*/
-//}
