@@ -10,9 +10,9 @@ Jacobi = csvread('Jacobi.csv')
 semilogy(N, GaussSeidel);
 hold on
 semilogy(N, Jacobi);
-legend('GaussSeidel', 'Jacobi');
+legend('Jacobi', 'GaussSeidel');
 title("B:Time of execution");
 ylabel("time [s]");
-xlabel("iterations");
+xlabel("Matrix size");
 hold off
 saveas(gcf, '/home/mikibak/matrix-operations-cpp/plots/iteracje.png');
